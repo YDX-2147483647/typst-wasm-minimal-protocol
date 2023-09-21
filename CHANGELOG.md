@@ -52,6 +52,16 @@ This is a docs-only update. For example, the links to examples now point to GitH
 
 ## wasi-stub
 
+### [Unreleased]
+
+#### Changed
+
+- Simplify the logic of storing stubbed functions (#93).
+
+  Previously, the complex logic forced many things to be converted to [`'static`](https://doc.rust-lang.org/book/ch10-03-lifetime-syntax.html#the-static-lifetime). Now those conversions are no longer needed.
+
+  The stubbed Wasm should be byte-for-byte identical to previous versions.
+
 ### [0.3.1] - 2026-09-03
 
 #### Changed

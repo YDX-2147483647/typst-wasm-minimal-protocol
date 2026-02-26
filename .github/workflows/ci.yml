@@ -56,8 +56,40 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - uses: typst-community/setup-typst@v4
+      # TODO: Simplify the following steps after https://github.com/typst-community/setup-typst/issues/53 is resolved.
+      - name: Setup Typst latest
+        uses: typst-community/setup-typst@v4
+        with:
+          typst-version: 0.14.2
+      - name: Setup Typst 0.13
+        uses: typst-community/setup-typst@v4
         with:
           typst-version: 0.13.1
+          executable-name: typst-0.13
+      - name: Setup Typst 0.12
+        uses: typst-community/setup-typst@v4
+        with:
+          typst-version: 0.12.0
+          executable-name: typst-0.12
+      - name: Setup Typst 0.11
+        uses: typst-community/setup-typst@v4
+        with:
+          typst-version: 0.11.1
+          executable-name: typst-0.11
+      - name: Setup Typst 0.10
+        uses: typst-community/setup-typst@v4
+        with:
+          typst-version: 0.10.0
+          executable-name: typst-0.10
+      - name: Setup Typst 0.9
+        uses: typst-community/setup-typst@v4
+        with:
+          typst-version: 0.9.0
+          executable-name: typst-0.9
+      - name: Setup Typst 0.8
+        uses: typst-community/setup-typst@v4
+        with:
+          typst-version: 0.8.0
+          executable-name: typst-0.8
 
       - run: ./.githooks/pre-push

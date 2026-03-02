@@ -34,20 +34,20 @@ For other languages, the protocol is described at <https://typst.app/docs/refere
 
 See the example for your language:
 
-- [Rust](examples/hello_rust/)
-- [Zig](examples/hello_zig/)
-- [C](examples/hello_c/)
-- [Go](examples/hello_go/)
-- [Haskell](examples/hello_haskell/)
+- [Rust](./examples/hello_rust/)
+- [Zig](./examples/hello_zig/)
+- [C](./examples/hello_c/)
+- [Go](./examples/hello_go/)
+- [Haskell](./examples/hello_haskell/)
 
 If you have all the required dependencies, you may build all examples by running `cargo test`.
 
-If you want to pass structured data to Typst, check how it's done with the [rust example using cbor](examples/hello_rust/).
+If you want to pass structured data to Typst, check how it's done with the [rust example using cbor](./examples/hello_rust/).
 
 ## wasi-stub
 
 The runtime used by typst do not allow the plugin to import any function (beside the ones used by the protocol). In particular, if your plugin is compiled for [WASI](https://wasi.dev/), it will not be able to be loaded by typst.
 
-To get around that, you can use [wasi-stub](./crates/wasi-stub). It will detect all WASI-related imports, and replace them by stubs that do nothing.
+To get around that, you can use [wasi-stub](./crates/wasi-stub/). It will detect all WASI-related imports, and replace them by stubs that do nothing.
 
 If you are compiling C code with `emcc`, or compiling Haskell code, stubbing is almost certainly required.

@@ -1,6 +1,6 @@
 [package]
 name = "wasi-stub"
-edition = "2021"
+edition = "2024"
 version = "0.3.0"
 authors = ["Arnaud Golfouse <arnaud.golfouse@laposte.net>"]
 license-file = "../../LICENSE"
@@ -8,8 +8,8 @@ description = "Detect all WASI-related imports in a WebAssembly file, and replac
 repository = "https://github.com/typst-community/wasm-minimal-protocol"
 
 [dependencies]
-wast = "219.0"
-wasmprinter = "0.219"
+wasmprinter = "0.245"
+wast = "245.0"
 
 [package.metadata.binstall]
 # cargo-binstall's default template does not recognize our tag names.

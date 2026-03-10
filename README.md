@@ -1,5 +1,12 @@
 # wasm-minimal-protocol
 
+[![Check](https://github.com/typst-community/wasm-minimal-protocol/actions/workflows/ci.yml/badge.svg)](https://github.com/typst-community/wasm-minimal-protocol/actions/workflows/ci.yml)
+[![wasm-minimal-protocol (macro) version on crates.io](https://img.shields.io/crates/v/wasm-minimal-protocol?logo=rust&label=macro)](https://crates.io/crates/wasm-minimal-protocol)
+[![wasi-stub version on crates.io](https://img.shields.io/crates/v/wasi-stub?logo=rust&label=wasi-stub)](https://crates.io/crates/wasi-stub)
+[![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/typst-community/wasm-minimal-protocol/total)](https://github.com/typst-community/wasm-minimal-protocol/releases)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/typst-community/wasm-minimal-protocol)
+[![GitHub contributors](https://img.shields.io/github/contributors/typst-community/wasm-minimal-protocol)](./CONTRIBUTING.md)
+
 A minimal protocol to write [Typst plugins](https://typst.app/docs/reference/foundations/plugin/).
 
 Note that plugins require Typst version `0.8.0` or later.

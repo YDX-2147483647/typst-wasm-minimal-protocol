@@ -6,7 +6,7 @@ Note that plugins require Typst version `0.8.0` or later.
 
 ## You want to write a plugin
 
-A plugin can be written in Rust, C, Zig, Go, or any language than compiles to WebAssembly.
+A plugin can be written in Rust, C, Zig, Go, Haskell, MoonBit, or any language that compiles to WebAssembly.
 
 Rust plugins can use this crate to automatically implement the protocol with a macro:
 
@@ -35,10 +35,11 @@ For other languages, the protocol is described at [Plugin Function – Typst Doc
 See the example for your language:
 
 - [Rust](./examples/hello_rust/) 🌟
-- [Zig](./examples/hello_zig/)
 - [C](./examples/hello_c/)
+- [Zig](./examples/hello_zig/)
 - [Go](./examples/hello_go/) 🌟
 - [Haskell](./examples/hello_haskell/)
+- [MoonBit](./examples/hello_moonbit/)
 
 If you want to pass structured data to Typst, the Typst functions [`cbor` and `cbor.encode`](https://typst.app/docs/reference/data-loading/cbor/) are available. Examples marked with 🌟 cover how it's done.
 

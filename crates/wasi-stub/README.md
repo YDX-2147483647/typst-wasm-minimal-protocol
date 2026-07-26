@@ -1,6 +1,6 @@
-# Wasi Stub
+# wasi-stub
 
-This is a tool allowing you to take a [wasi](https://wasi.dev/) compliant WebAssembly file and replace all functions wasi depends on by meaningless stubs.
+This is a tool allowing you to take a [WASI](https://wasi.dev/) compliant WebAssembly file and replace all functions that WASI depends on with meaningless stubs.
 
 If you don't depend on printing or reading/writing files, your code will probably still work, and will now be compatible with [Typst](https://typst.app/docs/reference/foundations/plugin/) or [Wasmi](https://crates.io/crates/wasmi).
 

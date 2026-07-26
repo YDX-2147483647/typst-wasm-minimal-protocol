@@ -52,7 +52,7 @@ foreign export ccall "hello"
   hello :: IO Int
 hello :: IO Int
 hello = do
-  sendResultToHost "Hello from wasm!!!"
+  sendResultToHost "Hello from Wasm!!!"
   return 0
 
 foreign export ccall "double_it"

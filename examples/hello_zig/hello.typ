@@ -4,7 +4,7 @@
 #{
   let p = plugin("./hello.wasm")
 
-  assert.eq(str(p.hello()), "Hello from wasm!!!")
+  assert.eq(str(p.hello()), "Hello from Wasm!!!")
   assert.eq(str(p.double_it(bytes("abc"))), "abcabc")
   assert.eq(str(p.concatenate(bytes("hello"), bytes("world"))), "hello*world")
   assert.eq(str(p.shuffle(bytes("s1"), bytes("s2"), bytes("s3"))), "s3-s1-s2")

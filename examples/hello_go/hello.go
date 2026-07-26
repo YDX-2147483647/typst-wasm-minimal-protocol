@@ -32,7 +32,7 @@ func main() {}
 
 //go:export hello
 func hello() int32 {
-	const msg = "Hello from wasm!!!"
+	const msg = "Hello from Wasm!!!"
 	SendResultToHost([]byte(msg))
 	return 0
 }

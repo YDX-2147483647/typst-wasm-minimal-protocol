@@ -40,7 +40,7 @@ fn write_args(arr : FixedArray[Byte]) -> Unit {
 
 ///|
 pub fn hello() -> Int {
-  send_result(b"Hello from wasm!!!")
+  send_result(b"Hello from Wasm!!!")
   0
 }
 

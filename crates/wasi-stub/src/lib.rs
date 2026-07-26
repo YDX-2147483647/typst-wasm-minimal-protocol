@@ -65,7 +65,7 @@ struct ToStub {
     results: Vec<ValType<'static>>,
 }
 
-/// Make the lifetime of things in WASM `'static`.
+/// Make the lifetime of things in Wasm `'static`.
 ///
 /// The return values will be used as fields to construct the stubbed functions in the for loop at the very end of the function [`stub_wasi_functions`].
 trait MakeStatic {
@@ -279,7 +279,7 @@ pub fn stub_wasi_functions(
     drop(types);
 
     let insert_stubs_index = insert_stubs_index
-        .expect("This is weird: there are no code sections in this wasm executable !");
+        .expect("This is weird: there are no code sections in this Wasm executable!");
 
     for (
         already_stubbed,

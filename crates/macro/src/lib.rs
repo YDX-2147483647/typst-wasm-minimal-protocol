@@ -1,4 +1,4 @@
-//! Minimal protocol for sending/receiving messages from and to a wasm host,
+//! Minimal protocol for sending/receiving messages from and to a Wasm host,
 //! especially [Typst](https://typst.app/docs/reference/foundations/plugin/) or [Wasmi](https://crates.io/crates/wasmi).
 //!
 //! If you define a function accepting `n` arguments of type `&[u8]`, it will

@@ -1,4 +1,4 @@
-# MoonBit WASM plugin example
+# MoonBit Wasm plugin example
 
 This is a bare-bones Typst plugin, written in [MoonBit](https://www.moonbitlang.com/).
 

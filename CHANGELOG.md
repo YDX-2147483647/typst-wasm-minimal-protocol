@@ -55,6 +55,7 @@ All dates in this file are in UTC.
 
 #### Fixed
 - `*.tar.gz` for macOS/Linux published to GitHub Releases are now correctly gzipped; files in previous releases have been manually renamed to `*.tar` to match their actual contents (#63).
+- Use the official abbreviations, [Wasm](https://webassembly.org) and [WASI](https://wasi.dev), in error and help messages (#83).
 
 ### [0.3.0] - 2026-03-06
 
@@ -80,7 +81,7 @@ The content is essentially the same as the last version.
 >
 > This version was published to crates.io later on 2026-03-02. The git worktree was [dirty](https://doc.rust-lang.org/cargo/commands/cargo-package.html?highlight=dirty#cargo_vcs_infojson-format) because `license-file` and `description` fields were added to `Cargo.toml`.
 
-`wasi-stub` is meant to be used on WASM libraries, which are compiled using [`WASI`](https://wasi.dev/) (for example, with the `wasm32-wasip1` rust target), but will be run in an environment where WASI functions are not available (like Typst plugins). `wasi-stub` will replace all the WASI functions with stubs, that immediately return a value without doing anything.
+`wasi-stub` is meant to be used on Wasm libraries, which are compiled using [`WASI`](https://wasi.dev/) (for example, with the `wasm32-wasip1` rust target), but will be run in an environment where WASI functions are not available (like Typst plugins). `wasi-stub` will replace all the WASI functions with stubs, that immediately return a value without doing anything.
 
 #### Added
 - Make it possible to stub modules other than `wasi_snapshot_preview1` with `--stub-module`, and even single functions with `--stub-function` (#17).

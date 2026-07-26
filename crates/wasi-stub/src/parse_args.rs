@@ -233,12 +233,12 @@ impl Args {
     {
         let mut arg_parser = TestArgParser::new(
             env!("CARGO_PKG_NAME"),
-            "A command to replace wasi functions with stubs. The stubbed function can still be called, but they won't have any side-effect, and will simply return dummy values.",
+            "A command to replace WASI functions with stubs. The stubbed functions can still be called, but they won't have any side effects, and will simply return dummy values.",
             vec![
                 Arg::Plain {
                     name: "file",
                     required: true,
-                    help: "Input wasm file.",
+                    help: "Input Wasm file.",
                 },
                 Arg::KeyValue {
                     keys: &["-o", "--output"],

@@ -25,14 +25,14 @@ initiate_protocol!();
 
 #[wasm_func]
 pub fn hello() -> Vec<u8> {
-    b"Hello from wasm!!!".to_vec()
+    b"Hello from Wasm!!!".to_vec()
 }
 ```
 
 ```typst
 // Typst file
 #let p = plugin("/path/to/plugin.wasm")
-#assert.eq(str(p.hello()), "Hello from wasm!!!")
+#assert.eq(str(p.hello()), "Hello from Wasm!!!")
 ```
 
 For other languages, the protocol is described at [Plugin Function – Typst Documentation](https://typst.app/docs/reference/foundations/plugin/). You should also take a look at this repository's [examples](#examples).
@@ -55,7 +55,7 @@ Some examples require [wasi-stub](#wasi-stub). You can [install wasi-stub](./cra
 If you have all the required dependencies, you may build all examples by running `cargo test`.
 Refer to [CONTRIBUTING](./CONTRIBUTING.md) for details.
 
-See also [WASM plugin development — Best of Typst (TCDM)](https://ydx-2147483647.github.io/best-of-typst/#wasm), which lists Zig wrapper, C protocol generator, and other projects that may facilitate development of plugins.
+See also [Wasm plugin development — Best of Typst (TCDM)](https://ydx-2147483647.github.io/best-of-typst/#wasm), which lists Zig wrapper, C protocol generator, and other projects that may facilitate development of plugins.
 
 ## wasi-stub
 

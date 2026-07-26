@@ -34,3 +34,17 @@ wasi-stub hello.wasm -o hello.wasm
 ## Build with Typst
 
 Simply run `typst compile hello.typ`, and observe that it works!
+
+## Further tip: High-level wrappers
+
+[Wasm plugin development — Best of Typst (TCDM)](https://ydx-2147483647.github.io/best-of-typst/#wasm) lists a few Zig wrappers made by the community, namely:
+
+- [typst-community/wasm-zig-typst](https://github.com/typst-community/wasm-zig-typst)
+
+  ![GitHub last commit](https://img.shields.io/github/last-commit/typst-community/wasm-zig-typst)
+  ![GitHub Repo stars](https://img.shields.io/github/stars/typst-community/wasm-zig-typst?style=flat)
+
+- [peterhellberg/typ](https://github.com/peterhellberg/typ)
+
+  ![GitHub last commit](https://img.shields.io/github/last-commit/peterhellberg/typ)
+  ![GitHub Repo stars](https://img.shields.io/github/stars/peterhellberg/typ?style=flat)

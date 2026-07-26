@@ -1,4 +1,4 @@
-# Go wasm plugin example
+# Go Wasm plugin example
 
 This is a bare-bones Typst plugin, written in Go.
 

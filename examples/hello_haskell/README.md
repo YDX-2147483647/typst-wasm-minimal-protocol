@@ -1,4 +1,4 @@
-# Haskell WASM plugin example
+# Haskell Wasm plugin example
 
 This is a bare-bone Typst plugin, written in Haskell.
 

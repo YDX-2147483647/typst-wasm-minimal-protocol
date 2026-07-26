@@ -33,7 +33,7 @@ const Retval = enum(i32) {
 };
 
 export fn hello() Retval {
-    sendResultToHost("Hello from wasm!!!");
+    sendResultToHost("Hello from Wasm!!!");
     return .success;
 }
 

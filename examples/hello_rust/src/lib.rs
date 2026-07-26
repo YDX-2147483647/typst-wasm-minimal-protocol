@@ -7,7 +7,7 @@ initiate_protocol!();
 
 #[wasm_func]
 pub fn hello() -> Vec<u8> {
-    b"Hello from wasm!!!".to_vec()
+    b"Hello from Wasm!!!".to_vec()
 }
 
 #[wasm_func]

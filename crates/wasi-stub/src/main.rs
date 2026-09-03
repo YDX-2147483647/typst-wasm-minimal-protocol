@@ -1,6 +1,6 @@
 mod parse_args;
 
-use std::path::PathBuf;
+use std::{fs, path::PathBuf};
 use wasi_stub::{Error, Result, stub_wasi_functions};
 
 fn main() -> Result<()> {
@@ -48,8 +48,11 @@ fn write_output(path: PathBuf, output_path: Option<PathBuf>, output: Vec<u8>) ->
             }
         }
     };
-    std::fs::write(&output_path, output)?;
-    let permissions = std::fs::File::open(path)?.metadata()?.permissions();
-    std::fs::File::open(output_path)?.set_permissions(permissions)?;
+    fs::write(&output_path, output)?;
+    let permissions = fs::metadata(&path)?.permissions();
+    // Use `fs::set_permissions(…)` in favor of `fs::File::open(…)?.set_permissions(…)`.
+    // On Windows, the latter fails with "Access is denied" (os error 5), because
+    // it requires write access but `open` asks for read access.
+    fs::set_permissions(&output_path, permissions)?;
     Ok(())
 }

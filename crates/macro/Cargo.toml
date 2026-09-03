@@ -1,6 +1,6 @@
 [package]
 name = "wasm-minimal-protocol"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 readme = "README.md" # Generated from the repo README; see the notes in .gitignore there
 authors = ["Astrale"]

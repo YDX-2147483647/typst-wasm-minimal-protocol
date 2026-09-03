@@ -21,6 +21,10 @@ All dates in this file are in UTC.
 
 ## wasm-minimal-protocol
 
+### [0.2.1] - 2026-09-03
+
+This is a docs-only update. For example, the links to examples now point to GitHub correctly on [docs.rs](https://docs.rs/wasm-minimal-protocol/latest/wasm_minimal_protocol/).
+
 ### [0.2.0] - 2026-04-12
 
 #### Added
@@ -48,7 +52,7 @@ All dates in this file are in UTC.
 
 ## wasi-stub
 
-### [Unreleased]
+### [0.3.1] - 2026-09-03
 
 #### Changed
 - Update wasm-tools dependencies 219 → 258 (#64, #84).

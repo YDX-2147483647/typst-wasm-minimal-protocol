@@ -6,10 +6,12 @@ This is a bare-bones Typst plugin, written in [Zig](https://ziglang.org/).
 
 ## Compile
 
-To compile this example, you need to first [install the minimum required Zig version](https://ziglang.org/learn/getting-started/).
+To compile this example, you need to first [install the Zig compiler](https://ziglang.org/learn/getting-started/).
 
 > [!Important]
-> This example may not build using other versions of Zig, as it introduces breaking changes in every release. You can grab the Zig release binaries from the Zig [Download](https://ziglang.org/download/) page.
+> It is recommended to use the minimum Zig version shown in the badge above. You can always grab a release binary for that version from the Zig [Download](https://ziglang.org/download/) page.
+>
+> This example may not build using other versions of Zig, as it introduces breaking changes in every release. See also the [further tip below](#supported-zig-versions).
 
 Then, build this package with:
 
@@ -35,7 +37,9 @@ wasi-stub hello.wasm -o hello.wasm
 
 Simply run `typst compile hello.typ`, and observe that it works!
 
-## Further tip: High-level wrappers
+## Further tips
+
+### High-level wrappers
 
 [Wasm plugin development — Best of Typst (TCDM)](https://ydx-2147483647.github.io/best-of-typst/#wasm) lists a few Zig wrappers made by the community, namely:
 
@@ -48,3 +52,13 @@ Simply run `typst compile hello.typ`, and observe that it works!
 
   ![GitHub last commit](https://img.shields.io/github/last-commit/peterhellberg/typ)
   ![GitHub Repo stars](https://img.shields.io/github/stars/peterhellberg/typ?style=flat)
+
+### Supported Zig versions
+
+This example includes two kinds of functions: simple functions that do not involve CBOR (e.g., `hello()`), and the `complex_data()` function which passes structured data as CBOR.
+
+- The simple functions basically work with any version of Zig. In fact, they have not changed significantly since Zig 0.13.0 (2024-06-07).
+
+- However, `complex_data()` depends on the [zbor](https://codeberg.org/r4gus/zbor) package, which is affected by breaking changes in Zig from time to time. Refer to [zbor's README](https://codeberg.org/r4gus/zbor/src/branch/HEAD/README.md#getting-started) for the compatibility between Zig versions and zbor versions.
+
+If you find that this example does not build with the minimum Zig version or any newer version, please [open an issue](https://github.com/typst-community/wasm-minimal-protocol/issues/new). If you want to use this example with an older Zig version, you can try inspecting the [history of `build.zig.zon`](https://github.com/typst-community/wasm-minimal-protocol/commits/main/examples/hello_zig/build.zig.zon) and viewing this example at the relevant revision.

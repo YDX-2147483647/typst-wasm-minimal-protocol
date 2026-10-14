@@ -1,7 +1,7 @@
 [package]
 name = "hello"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [lib]
 crate-type = ["cdylib"]
@@ -10,14 +10,14 @@ crate-type = ["cdylib"]
 # Same package and version as Typst uses.
 ciborium = "0.2.1"
 serde = "1.0"
-wasm-minimal-protocol = { path = "../../crates/macro" }
+wasm-minimal-protocol = { path = "../../crates/macro" } # Use "0.2" in your project
 
 
 [profile.release]
 lto = true          # Enable link-time optimization
-strip = true        # Strip symbols from binary*
-opt-level = 'z'     # Optimize for size
+strip = true        # Strip symbols from binary
+opt-level = 'z'     # Optimize for size to avoid bloating the Typst Universe; use `3` for better performance
 codegen-units = 1   # Reduce number of codegen units to increase optimizations
 panic = 'abort'     # Abort on panic
 
-[workspace] # so that it is not included in the upper workspace
+[workspace] # so that it is not included in the upper workspace; unnecessary for most projects

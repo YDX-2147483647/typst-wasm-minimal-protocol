@@ -1,0 +1,24 @@
+[package]
+name = "hello"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+ciborium = { version = "0.2.1", default-features = false }
+dlmalloc = { version = "0.2.14", default-features = false, features = ["global"] }
+serde = { version = "1.0", default-features = false, features = ["derive"] }
+wasm-minimal-protocol = { path = "../../crates/macro" }
+
+
+# See `../hello_rust/Cargo.toml` for explanations.
+[profile.release]
+lto = true
+strip = true
+opt-level = 'z'
+codegen-units = 1
+panic = 'abort'
+
+[workspace]

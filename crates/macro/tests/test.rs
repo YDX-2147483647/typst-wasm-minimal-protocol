@@ -87,7 +87,9 @@ fn typst_compile(path: &Path) {
         .filter_map(|(compiler, version)| (*version >= min_compiler).then_some(compiler))
         .collect();
     if compatible_compilers.is_empty() {
-        panic!("No compatible Typst compiler found. Minimum supported version is {min_compiler}, but found: {TYPST_COMPILERS:?}");
+        panic!(
+            "No compatible Typst compiler found. Minimum supported version is {min_compiler}, but found: {TYPST_COMPILERS:?}"
+        );
     }
 
     // Call compilers
@@ -115,7 +117,7 @@ fn typst_compile(path: &Path) {
 /// Save resulting `hello.{wasm,pdf}` to `target/example-result/` if `$CARGO_TEST_SAVE_EXAMPLE_RESULT` is set to any non-empty string.
 ///
 /// The `name` is necessary to distinguish results from different build methods for the same example.
-/// For example, `rust.wasm32-unknown-unknown` and `rust.wasm32-wasip1`.
+/// For example, `rust.std.wasm32-unknown-unknown` and `rust.no_std.wasm32-wasip1`.
 fn save_result(path: &Path, name: &str) {
     if std::env::var_os("CARGO_TEST_SAVE_EXAMPLE_RESULT")
         .unwrap_or_default()
@@ -167,34 +169,34 @@ fn test_c() {
 
 #[test]
 fn test_rust() {
-    let dir_path = Path::new(concat!(
-        env!("CARGO_MANIFEST_DIR"),
-        "/../../examples/hello_rust"
-    ));
+    for (name, suffix) in &[("std", ""), ("no_std", "_no_std")] {
+        let dir_path = Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/../../examples/"))
+            .join(format!("hello_rust{suffix}"));
 
-    for target in ["wasm32-unknown-unknown", "wasm32-wasip1"] {
-        let build_rust = Command::new("cargo")
-            .arg("build")
-            .arg("--release")
-            .arg("--target")
-            .arg(target)
-            .current_dir(dir_path)
-            .output()
+        for target in ["wasm32-unknown-unknown", "wasm32-wasip1"] {
+            let build_rust = Command::new("cargo")
+                .arg("build")
+                .arg("--release")
+                .arg("--target")
+                .arg(target)
+                .current_dir(&dir_path)
+                .output()
+                .unwrap();
+            assert_success(&format!("Compiling with cargo ({name})"), &build_rust);
+            std::fs::copy(
+                dir_path
+                    .join("target")
+                    .join(target)
+                    .join("release/hello.wasm"),
+                dir_path.join("hello.wasm"),
+            )
             .unwrap();
-        assert_success("Compiling with cargo", &build_rust);
-        std::fs::copy(
-            dir_path
-                .join("target")
-                .join(target)
-                .join("release/hello.wasm"),
-            dir_path.join("hello.wasm"),
-        )
-        .unwrap();
-        if target == "wasm32-wasip1" {
-            wasi_stub(dir_path.join("hello.wasm"));
+            if target == "wasm32-wasip1" {
+                wasi_stub(dir_path.join("hello.wasm"));
+            }
+            typst_compile(&dir_path);
+            save_result(&dir_path, &format!("rust.{name}.{target}"));
         }
-        typst_compile(dir_path);
-        save_result(dir_path, &format!("rust.{}", target));
     }
 }
 

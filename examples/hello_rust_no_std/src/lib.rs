@@ -1,0 +1,91 @@
+// Setup `no_std` Rust and `wasm_minimal_protocol`.
+
+#![no_std]
+extern crate alloc;
+use alloc::{boxed::Box, string::String, string::ToString, vec, vec::Vec};
+
+use wasm_minimal_protocol::{initiate_protocol, wasm_func};
+
+// Only necessary when using cbor for passing arguments.
+use ciborium::{de::from_reader, ser::into_writer};
+
+initiate_protocol!();
+
+#[panic_handler]
+fn on_panic(_info: &core::panic::PanicInfo) -> ! {
+    core::arch::wasm32::unreachable()
+}
+
+#[global_allocator]
+static ALLOC: dlmalloc::GlobalDlmalloc = dlmalloc::GlobalDlmalloc;
+
+// Implement concrete plugin functions as usual.
+// The code is actually identical to `../../hello_rust/src/lib.rs`.
+
+#[wasm_func]
+pub fn hello() -> Vec<u8> {
+    b"Hello from Wasm!!!".to_vec()
+}
+
+#[wasm_func]
+pub fn double_it(arg: &[u8]) -> Vec<u8> {
+    [arg, arg].concat()
+}
+
+#[wasm_func]
+pub fn concatenate(arg1: &[u8], arg2: &[u8]) -> Vec<u8> {
+    [arg1, b"*", arg2].concat()
+}
+
+#[wasm_func]
+pub fn shuffle(arg1: &[u8], arg2: &[u8], arg3: &[u8]) -> Vec<u8> {
+    [arg3, b"-", arg1, b"-", arg2].concat()
+}
+
+#[wasm_func]
+pub fn returns_ok() -> Result<Vec<u8>, String> {
+    Ok(b"This is an `Ok`".to_vec())
+}
+
+#[wasm_func]
+pub fn returns_err() -> Result<Vec<u8>, String> {
+    Err(String::from("This is an `Err`"))
+}
+
+#[wasm_func]
+pub fn will_panic() -> Vec<u8> {
+    panic!("unconditional panic")
+}
+
+// Some data structures might require extra setup for serde crates.
+// If you encounter an error, refer to https://serde.rs/no-std.html.
+#[derive(serde::Deserialize)]
+struct ComplexDataArgs {
+    x: i32,
+    y: f64,
+}
+
+#[wasm_func]
+pub fn complex_data(arg: &[u8]) -> Vec<u8> {
+    let args: ComplexDataArgs = from_reader(arg).unwrap();
+    let sum = args.x as f64 + args.y;
+    let mut out = Vec::new();
+    into_writer(&sum, &mut out).unwrap();
+    out
+}
+
+#[wasm_func]
+pub fn set_to_a(arg: &mut [u8]) -> Vec<u8> {
+    for c in &mut *arg {
+        *c = b'a';
+    }
+    arg.to_vec()
+}
+
+#[wasm_func]
+pub fn set_to_a_reuse_buffer(arg: &mut [u8]) -> &[u8] {
+    for c in &mut *arg {
+        *c = b'a';
+    }
+    arg
+}

@@ -1,4 +1,4 @@
-use wasm_minimal_protocol::*;
+use wasm_minimal_protocol::{initiate_protocol, wasm_func};
 
 // Only necessary when using cbor for passing arguments.
 use ciborium::{de::from_reader, ser::into_writer};

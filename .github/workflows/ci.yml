@@ -5,7 +5,7 @@ env:
   # To avoid conflicts, we add the `X_` prefix.
   X_C_COMPILER_VERSION: 6.0.13
   X_C_CACHE_FOLDER: "emsdk-cache"
-  X_GO_COMPILER_VERSION: 0.43.0
+  X_GO_COMPILER_VERSION: 0.44.0
   X_ZIG_COMPILER_VERSION: 0.17.0 # Sync this with `minimum_zig_version` in `build.zig.zon`.
   X_HASKELL_COMPILER_VERSION: "9.14"
   # ↓ Also save the version date for future reference, because MoonBit does not seem to publish its full version history.

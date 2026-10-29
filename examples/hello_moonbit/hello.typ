@@ -1,5 +1,5 @@
-//! Minimum supported Typst version: 0.8.0
-//! Before that, Wasm plugin was not supported.
+//! Minimum supported Typst version: 0.14.0
+//! Before that, SIMD was not supported by the WebAssembly runtime, but Wasm files compiled from MoonBit 0.10.17+d971670cd (2026-10-23) require SIMD.
 
 #{
   let p = plugin("./hello.wasm")

@@ -8,7 +8,8 @@ env:
   X_GO_COMPILER_VERSION: 0.43.0
   X_ZIG_COMPILER_VERSION: 0.17.0 # Sync this with `minimum_zig_version` in `build.zig.zon`.
   X_HASKELL_COMPILER_VERSION: "9.14"
-  X_MOONBIT_COMPILER_VERSION: 0.10.15+943464bfa
+  # ↓ Also save the version date for future reference, because MoonBit does not seem to publish its full version history.
+  X_MOONBIT_COMPILER_VERSION: 0.10.17+d971670cd # 2026-10-23
 
 on:
   push:

@@ -69,3 +69,9 @@ The diff was extracted from [refactor: Remove inline wasm ABI pointer shifts by 
 Nonetheless, there are other approaches that do not rely on the unstable representation. For example, we can write data outside the heap (below [heap-start-address](https://docs.moonbitlang.com/en/latest/toolchain/moon/package.html#wasm-linear-backend-link-options)) and manage it manually[^heap]. It is not yet clear whether these approaches are better or not. Feedback and contributions are welcome.
 
 [^heap]: This approach was proposed by tonyfettes in 2026-03 on the [MoonBit Chinese forum](https://taolun.moonbitlang.com/t/topic/1397/2).
+
+### SIMD
+
+Wasm files compiled from MoonBit 0.10.17+d971670cd (2026-10-23) depend on the WebAssembly SIMD functionality, which was supported by Typst [starting from 0.14.0](https://github.com/typst/typst/pull/6997).
+
+Note that Wasm files compiled from MoonBit 0.10.15+943464bfa (2026-10-12) or earlier do not depend on SIMD. It is unknown whether this change was intentional or accidental. The [PR moonbitlang/core#4308](https://github.com/moonbitlang/core/pull/4308 "perf(builtin): vectorise unsafe_range_equal bodies on wasm by bobzhang") might be related, but the relationship between moonbitlang/core commits and MoonBit versions is also mysterious.

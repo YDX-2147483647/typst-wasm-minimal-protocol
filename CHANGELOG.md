@@ -21,6 +21,8 @@ All dates in this file are in UTC.
 
 ## wasm-minimal-protocol
 
+### [Unreleased]
+
 ### [0.2.1] - 2026-09-03
 
 This is a docs-only update. For example, the links to examples now point to GitHub correctly on [docs.rs](https://docs.rs/wasm-minimal-protocol/latest/wasm_minimal_protocol/).
@@ -54,6 +56,8 @@ This is a docs-only update. For example, the links to examples now point to GitH
 
 ### [Unreleased]
 
+### [0.3.2] - 2026-10-31
+
 #### Changed
 
 - Simplify the logic of storing stubbed functions (#93).
@@ -62,7 +66,7 @@ This is a docs-only update. For example, the links to examples now point to GitH
 
   The stubbed Wasm should be byte-for-byte identical to previous versions.
 
-- chore(wasi-stub): update wasm-tools dependencies 258 → 263 (#94).
+- Update wasm-tools dependencies 258 → 263 (#94).
 
 ### [0.3.1] - 2026-09-03
 

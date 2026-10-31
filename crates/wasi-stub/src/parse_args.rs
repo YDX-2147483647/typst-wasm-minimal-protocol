@@ -35,7 +35,8 @@ enum Arg {
     },
 }
 
-struct TestArgParser {
+/// Custom parsing of the command-line arguments
+struct ArgParser {
     command_name: &'static str,
     help: &'static str,
     args: Vec<Arg>,
@@ -45,7 +46,7 @@ struct TestArgParser {
     key_values: HashMap<String, OsString>,
     requested_help: bool,
 }
-impl TestArgParser {
+impl ArgParser {
     fn new(command_name: &'static str, help: &'static str, args: Vec<Arg>) -> Self {
         Self {
             command_name,
@@ -231,7 +232,7 @@ impl Args {
     where
         T: Into<OsString>,
     {
-        let mut arg_parser = TestArgParser::new(
+        let mut arg_parser = ArgParser::new(
             env!("CARGO_PKG_NAME"),
             "A command to replace WASI functions with stubs. The stubbed functions can still be called, but they won't have any side effects, and will simply return dummy values.",
             vec![

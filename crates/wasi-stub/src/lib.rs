@@ -3,11 +3,10 @@ use std::collections::{HashMap, HashSet};
 use wast::{
     Wat,
     core::{
-        Expression, Func, FuncKind, FunctionType, HeapType, ImportItems, InlineExport,
-        InnerTypeKind, Instruction, ItemKind, Local, ModuleField, ModuleKind, RefType, TypeUse,
-        ValType,
+        Expression, Func, FuncKind, FunctionType, ImportItems, InlineExport, InnerTypeKind,
+        Instruction, ItemKind, Local, ModuleField, ModuleKind, TypeUse, ValType,
     },
-    token::{Id, Index, NameAnnotation},
+    token::{Id, Index, NameAnnotation, Span},
 };
 
 #[derive(Debug)]
@@ -47,86 +46,20 @@ enum ImportIndex {
     Keep(u32),
 }
 
-/// A function to be stubbed.
-struct ToStub {
-    /// The index of the original import field in the module.
-    fields_index: usize,
+/// The signature of a function to be stubbed.
+struct ToStub<'a> {
     /// The span of the original import field.
-    span: wast::token::Span,
+    span: Span,
     /// The type of the function, with parameters and results.
-    ty: TypeUse<'static, FunctionType<'static>>,
+    ty: TypeUse<'a, FunctionType<'a>>,
     /// The identifier used during name resolution to refer to the function from the rest of the module.
-    id: Option<Id<'static>>,
+    id: Option<Id<'a>>,
     /// The name of the function.
-    name: Option<NameAnnotation<'static>>,
+    name: Option<NameAnnotation<'a>>,
     /// The parameters of the function.
-    locals: Vec<Local<'static>>,
+    locals: Vec<Local<'a>>,
     /// The results types of the function.
-    results: Vec<ValType<'static>>,
-}
-
-/// Make the lifetime of things in Wasm `'static`.
-///
-/// The return values will be used as fields to construct the stubbed functions in the for loop at the very end of the function [`stub_wasi_functions`].
-trait MakeStatic {
-    /// The static version of `Self`.
-    type S;
-    /// Make its lifetime `'static`.
-    #[must_use]
-    fn make_static(&self) -> Self::S;
-}
-impl MakeStatic for Id<'_> {
-    type S = Id<'static>;
-    fn make_static(&self) -> Self::S {
-        let mut name = self.name().to_owned();
-        name.insert(0, '$');
-        let parser = Box::leak(Box::new(
-            wast::parser::ParseBuffer::new(name.leak()).unwrap(),
-        ));
-        wast::parser::parse::<Id>(parser).unwrap()
-    }
-}
-impl MakeStatic for NameAnnotation<'_> {
-    type S = NameAnnotation<'static>;
-    fn make_static(&self) -> Self::S {
-        NameAnnotation {
-            name: String::from(self.name).leak(),
-        }
-    }
-}
-impl MakeStatic for ValType<'_> {
-    type S = ValType<'static>;
-    fn make_static(&self) -> Self::S {
-        // FIXME: This long match dance might be unnecessary or can be simplified.
-        match self {
-            ValType::I32 => ValType::I32,
-            ValType::I64 => ValType::I64,
-            ValType::F32 => ValType::F32,
-            ValType::F64 => ValType::F64,
-            ValType::V128 => ValType::V128,
-            ValType::Ref(r) => ValType::Ref(RefType {
-                nullable: r.nullable,
-                heap: match r.heap {
-                    HeapType::Concrete(index) => HeapType::Concrete(match index {
-                        Index::Num(n, s) => Index::Num(n, s),
-                        Index::Id(id) => Index::Id(id.make_static()),
-                    }),
-                    HeapType::Exact(index) => HeapType::Exact(match index {
-                        Index::Num(n, s) => Index::Num(n, s),
-                        Index::Id(id) => Index::Id(id.make_static()),
-                    }),
-                    HeapType::Abstract { shared, ty } => HeapType::Abstract { shared, ty },
-                },
-            }),
-        }
-    }
-}
-impl<T: MakeStatic> MakeStatic for Option<T> {
-    type S = Option<T::S>;
-    #[inline]
-    fn make_static(&self) -> Self::S {
-        self.as_ref().map(|t| t.make_static())
-    }
+    results: Vec<ValType<'a>>,
 }
 
 pub fn stub_wasi_functions(
@@ -156,18 +89,21 @@ pub fn stub_wasi_functions(
     // - Update references to the original function.
     //
     // We achieve it in two for-loops:
-    // 1. Scan functions to be stubbed, and update references to them.
-    // 2. For each function to be stubbed, swap its import field with the definition of its stub.
+    // 1. Scan functions to be stubbed, replace their imports with stub functions, and update references to the original functions.
+    // 2. Move stub functions to the place immediately before other functions, so that all functions are adjacent to each other.
 
     // Types defined in the module
     let mut types = Vec::new();
-    // Imports to be kept
-    let mut kept = Vec::new();
-    // Imports to be stubbed
+    // Imports to be kept; only the number of them matters, so the actual import fields are not stored
+    let mut num_kept = 0;
+    // Imports to be stubbed, represented as the indices of their import fields in the original module
     let mut to_stub = Vec::new();
     // The place to insert definitions of stubs
     let mut insert_stubs_index = None;
-    // Imports after stubbing, represented as indices in `to_stub` or `kept`
+    // Imports after stubbing
+    // `new_import_indices[n]` represents the n-th import field in the original module.
+    // If that import was kept, then `new_import_indices[n]` means its index among all kept imports.
+    // If that import was stubbed, then `new_import_indices[n]` is its index in `to_stub`.
     let mut new_import_indices = Vec::new();
 
     for (field_idx, field) in fields.iter_mut().enumerate() {
@@ -193,7 +129,7 @@ pub fn stub_wasi_functions(
                     }
                 });
 
-                // Push the import to either `to_stub` or `kept`
+                // Push the import to either `to_stub` or `0..num_kept`, and save the new index
                 let new_index = match info {
                     Some((module, name, sig, type_index))
                         if should_stub.should_stub(module, name) =>
@@ -208,29 +144,20 @@ pub fn stub_wasi_functions(
                         else {
                             continue;
                         };
-                        to_stub.push(ToStub {
-                            fields_index: field_idx,
-                            span: i.span,
-                            ty,
-                            // Make fields 'static
-                            id: sig.id.make_static(),
-                            name: sig.name.make_static(),
-                            locals: func_typ
-                                .params
-                                .iter()
-                                .map(|(id, name, val_type)| Local {
-                                    id: id.make_static(),
-                                    name: name.make_static(),
-                                    ty: val_type.make_static(),
-                                })
-                                .collect(),
-                            results: func_typ.results.iter().map(|r| r.make_static()).collect(),
-                        });
+
+                        to_stub.push(field_idx);
+
+                        // Replace the import field with a stub function. We will move the stub to the end of other imports later.
+                        *field = ModuleField::Func(
+                            ToStub::build(i.span, sig, ty, func_typ)
+                                .try_into_func_with(return_value)?,
+                        );
+
                         ImportIndex::ToStub(to_stub.len() as u32 - 1)
                     }
                     _ => {
-                        kept.push(i);
-                        ImportIndex::Keep(kept.len() as u32 - 1)
+                        num_kept += 1;
+                        ImportIndex::Keep(num_kept - 1)
                     }
                 };
                 // Save the import to `new_import_indices`
@@ -260,8 +187,9 @@ pub fn stub_wasi_functions(
                                 | Instruction::Call(Index::Num(index, _)) => {
                                     if let Some(new_index) = new_import_indices.get(*index as usize)
                                     {
+                                        // The relationship between the old `index` and the `new_index` is guaranteed by the moves below.
                                         *index = match new_index {
-                                            ImportIndex::ToStub(idx) => *idx + kept.len() as u32,
+                                            ImportIndex::ToStub(idx) => *idx + num_kept,
                                             ImportIndex::Keep(idx) => *idx,
                                         };
                                     }
@@ -275,30 +203,65 @@ pub fn stub_wasi_functions(
             _ => {}
         }
     }
-    drop(kept);
     drop(types);
 
     let insert_stubs_index = insert_stubs_index
         .expect("This is weird: there are no code sections in this Wasm executable!");
 
-    for (
-        already_stubbed,
+    for (num_already_moved, old_index) in to_stub.into_iter().enumerate() {
+        // Before this for-loop, we have put the stubs among the kept imports.
+        // Now we move the stubs to the place immediately before other functions.
+        //
+        // Suppose we are moving `stub_c` in this iteration, then the layouts of `fields` are as follows.
+        //
+        //                                                 ↓ old_index
+        // - The original module:    import_a, import_b, import_c, import_d,   ……     func_e, func_f
+        // - Before this for-loop:   import_a,  stub_b,  [stub_c], import_d,   ……     func_e, func_f
+        // - Before this iteration:  import_a, [stub_c], import_d,    ……     stub_b,  func_e, func_f
+        // - After `fields.remove`:  import_a, import_d,    ……      stub_b,  func_e,  func_f
+        // - After `fields.insert`:  import_a, import_d,    ……      stub_b, [stub_c], func_e, func_f
+        //                                       ↑ old_index - num_already_moved        ↑ insert_stubs_index
+        let stub = fields.remove(old_index - num_already_moved);
+        assert!(
+            matches!(stub, ModuleField::Func(_)),
+            "The import field {stub:?} was not stubbed as planned. This is a bug of wasi-stub. Please report an issue.",
+        );
+        fields.insert(insert_stubs_index - 1, stub);
+    }
+
+    Ok(module.encode()?)
+}
+
+impl<'a> ToStub<'a> {
+    fn build(
+        span: Span,
+        sig: &wast::core::ItemSig<'a>,
+        ty: TypeUse<'a, FunctionType<'a>>,
+        func_typ: &FunctionType<'a>,
+    ) -> Self {
         ToStub {
-            fields_index,
             span,
             ty,
-            name,
-            id,
-            locals,
-            results,
-        },
-    ) in to_stub.into_iter().enumerate()
-    {
-        // Define the stubbed function
-        let instructions = results
+            id: sig.id,
+            name: sig.name,
+            locals: func_typ
+                .params
+                .iter()
+                .map(|&(id, name, ty)| Local { id, name, ty })
+                .collect(),
+            results: func_typ.results.to_vec(),
+        }
+    }
+
+    /// Convert the function signature `ToStub` into a stub function with the given return value.
+    ///
+    /// We use a weird return value. Hopefully this makes it easier to track usage of the stubbed function.
+    fn try_into_func_with(self, return_value: u32) -> Result<Func<'a>> {
+        let instructions = self
+            .results
             .iter()
             .map(|val_type| {
-                // Return weird values as the expected types, hopefully this makes it easier to track usage of these stubbed functions.
+                // Return the weird value as the expected type.
                 let instruction = match val_type {
                     ValType::I32 => Instruction::I32Const(return_value as i32),
                     ValType::I64 => Instruction::I64Const(return_value as i64),
@@ -311,39 +274,30 @@ pub fn stub_wasi_functions(
                     _ => {
                         return Err(Error::message(format!(
                             "Unsupported stub return type {:?} for function {:?}",
-                            val_type, name
+                            val_type, self.name
                         )));
                     }
                 };
                 Ok(instruction)
             })
             .collect::<Result<Vec<_>>>()?;
-        let function = Func {
-            span,
-            id,
-            name,
+        Ok(Func {
+            span: self.span,
+            ty: self.ty,
+            id: self.id,
+            name: self.name,
             // no exports
             exports: InlineExport { names: Vec::new() },
             kind: wast::core::FuncKind::Inline {
-                locals: locals.into_boxed_slice(),
+                locals: self.locals.into_boxed_slice(),
                 expression: Expression {
                     instrs: instructions.into_boxed_slice(),
                     branch_hints: Box::new([]),
                     instr_spans: None,
                 },
             },
-            ty,
-        };
-        // Swap the import field with the stubbed `function`.
-        // - Before: import_a, [import_b], import_c, func_d, func_e
-        // - After:  import_a,  import_c,  [func_b], func_d, func_e
-        //                                    ↑ insert_stubs_index
-        //                        ↑ fields_index - already_stubbed
-        fields.insert(insert_stubs_index, ModuleField::Func(function));
-        fields.remove(fields_index - already_stubbed);
+        })
     }
-
-    Ok(module.encode()?)
 }
 
 // Error handling
